@@ -1,0 +1,83 @@
+_ pack_state(int seqno, int pubkey, int order_seqno, int number_of_wins, int incoming_amount, int outgoing_amount, int owner_wc, int owner_account_id, cell orders) inline_ref {
+    return begin_cell()
+            .store_uint(seqno, 32)
+            .store_uint(pubkey, 256)
+            .store_uint(order_seqno, 32)
+            .store_uint(number_of_wins, 32)
+            .store_grams(incoming_amount)
+            .store_grams(outgoing_amount)
+            .store_int(owner_wc, 32)
+            .store_uint(owner_account_id, 256)
+            .store_dict(orders)
+            .end_cell();
+}
+
+
+_ unpack_state() inline_ref {
+    var ds = begin_parse(get_data());
+    var unpacked = (ds~load_uint(32), ds~load_uint(256), ds~load_uint(32), ds~load_uint(32), ds~load_grams(), ds~load_grams(), ds~load_int(32), ds~load_uint(256), ds~load_dict());
+    ds.end_parse();
+    return unpacked;
+}
+
+_ unpack_order(slice order) inline_ref {
+    return (order~load_uint(32), order~load_uint(8), order~load_uint(32), order~load_grams(), order~load_int(32), order~load_uint(256));
+}
+
+tuple order_tuple(int id, int status, int timestamp, int amount, int wc, int account_id) 
+    asm(id status timestamp amount wc account_id) "6 TUPLE";
+
+var get_orders() method_id {
+    (_, _, _, _, _, _, _, _, cell orders) = unpack_state();
+    int cursor = 0x7fffffff;
+    var l = nil;
+    do {
+        (cursor, var order, var found) = orders.udict_get_prev?(32, cursor);
+        if (found) {
+            (int id, int status, int timestamp, int amount, int wc, int account_id) = unpack_order(order);
+            l = cons(order_tuple(id, status, timestamp, amount, wc, account_id), l);
+        }
+    } until ( ~ found)
+    return l;
+}
+
+
+() send_grams(int wc, int addr, int grams) impure {
+    ;; int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool src:MsgAddress -> 011000
+    cell msg = begin_cell()
+    ;;  .store_uint(0, 1) ;; 0 <= format indicator int_msg_info$0 
+    ;;  .store_uint(1, 1) ;; 1 <= ihr disabled
+    ;;  .store_uint(1, 1) ;; 1 <= bounce = true
+    ;;  .store_uint(0, 1) ;; 0 <= bounced = false
+    ;;  .store_uint(4, 5) ;; 00100 <= address flags, anycast = false, 8-bit workchain
+        .store_uint(196, 9)
+        .store_int(wc, 8)
+        .store_uint(addr, 256)
+        .store_grams(grams)
+        .store_uint(0, 107) ;; 106 zeroes +  0 as an indicator that there is no cell with the data.
+        .end_cell();
+    send_raw_message(msg, 3); ;; mode, 2 for ignoring errors, 1 for sender pays fees, 64 for returning inbound message value
+}
+
+
+_ pack_order(int id, int status, int timestamp, int amount, int wc, int account_id) inline_ref {
+    return begin_cell()
+            .store_uint(id, 32)
+            .store_uint(status, 8)
+            .store_uint(timestamp, 32)
+            .store_grams(amount)
+            .store_int(wc, 32)
+            .store_uint(account_id, 256);
+}
+
+
+var remove_old_orders(var orders, int order_seqno) {
+    int cursor = order_seqno - 20;
+    do {
+        (cursor, var order, var found) = orders.udict_get_prev?(32, cursor);
+        if (found) {
+            orders~udict_delete_get?(32, cursor);
+        }
+    } until ( ~ found)
+    return orders;
+}

@@ -1,0 +1,37 @@
+int balance() inline_ref method_id {
+    return get_balance().pair_first();
+}
+
+int seqno() method_id {
+  return get_data().begin_parse().preload_uint(32);
+}
+
+int get_seqno() method_id {
+    (int stored_seqno, _, _, _, _, _, _, _, _) = unpack_state();
+    return stored_seqno;
+}
+
+int get_pubkey() method_id {
+    (_, int pubkey, _, _, _, _, _, _, _) = unpack_state();
+    return pubkey;
+}
+
+int get_order_seqno() method_id {
+    (_, _, int order_seqno, _, _, _, _, _, _) = unpack_state();
+    return order_seqno;
+}
+
+int get_number_of_wins() method_id {
+     (_, _, _, int number_of_wins, _, _, _, _, _) = unpack_state();
+     return number_of_wins;
+}
+
+int get_incoming_amount() method_id {
+    (_, _, _, _, int incoming_amount, _, _, _, _) = unpack_state();
+    return incoming_amount;
+}
+
+int get_outgoing_amount() method_id {
+    (_, _, _, _, _, int outgoing_amount, _, _, _) = unpack_state();
+    return outgoing_amount;
+}
