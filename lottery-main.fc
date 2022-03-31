@@ -161,12 +161,3 @@
 {-
         Why? It has send_grams() and set_data() methods too.
 -}
-
-;; Q2 after run publish script one got SM address which depends on run script hash (and probbly no depends on inner SM logic...)
-{-
-    How to preserve contract address from deploy to its update?
--}
-
-;; Q3 how to prevent someone to update my SM in prod?
-{-  -}
-

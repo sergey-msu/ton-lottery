@@ -20,13 +20,22 @@ variable orders
 dictnew orders !
 
 // data
-<b 0 32 u, file-base +".pk" load-generate-keypair constant wallet_pk B, 0 32 u, 0 32 u, 0 Gram, 0 Gram, owner_workchain @ 32 i, owner_account_id @ 256 u, orders @ dict, b>
+<b 0 32 u,
+   file-base +".pk" load-generate-keypair constant wallet_pk B, 
+   0 32 u, 
+   0 32 u,
+   0 Gram, 
+   0 Gram, 
+   owner_workchain @ 32 i, 
+   owner_account_id @ 256 u, 
+   orders @ dict,
+b>
 
 // no libraries
 null 
 // Libs{ x{ABACABADABACABA} drop x{AAAA} s>c public_lib x{1234} x{5678} |_ s>c public_lib }Libs
 
-// create StateInit = code + data, new address = hash(StateInit) 
+// create StateInit = code + data, new wallet_addr = hash(StateInit) 
 <b b{0011} s, 3 roll ref, rot ref, swap dict, b> 
 dup ."StateInit: " <s csr. cr
 dup hashu wc swap 2dup 2constant wallet_addr
@@ -45,7 +54,7 @@ b{000010} s,
 swap <s s, 
 b{0} s, 
 swap B, 
-swap <s s, 
+swap <s s,
 b>
 
 dup ."External message for initialization is " <s csr. cr
