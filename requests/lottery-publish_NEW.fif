@@ -22,7 +22,7 @@ def? $2 { @' $2 } { "out/lottery" } cond =: file-base  // file path prefix
 b> <s =: contract_data
 
 // libraries
-null 
+null
 
 // create StateInit = (flags, code, data)
 <b 
