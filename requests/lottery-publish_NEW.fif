@@ -49,7 +49,7 @@ dup hashu wallet_pk ed25519_sign_uint rot
 // final external query to blockchain
 <b 
    b{1000100} s, 
-   smc_addr addr, 
+   smc_addr addr,      // { -rot 8 i, swap 256 u, } : addr  (see TonUtil.fif)
    b{000010} s, 
    state_init <s s, 
    b{0} s, 

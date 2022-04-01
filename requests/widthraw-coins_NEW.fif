@@ -1,0 +1,39 @@
+#!/usr/bin/env fift -s
+"TonUtil.fif" include
+"Asm.fif" include
+
+variable seqno 
+1 seqno ! 
+
+variable smc_owner_pk 
+
+"out/lottery.pk" file>B smc_owner_pk ! 
+
+"out/lottery.addr" load-address 
+2dup 2constant smc_addr
+
+."Source wallet address: " 2dup .addr cr 
+."Same base64url address: " 6 .Addr cr
+
+// external message + signing
+<b 
+    seqno @ 32 u, 
+    2 7 u,  // op code = 2 (widthraw)
+    1500000000 Gram, 
+b> dup := ext_message
+dup ."Signing message: " <s csr. cr
+dup hashu smc_owner_pk @ ed25519_sign_uint
+
+// final external query to blockchain
+<b 
+    b{1000100} s, 
+    smc_addr addr, 
+    0 Gram, 
+    b{00} s, 
+    ext_message <s s, 
+b>
+
+dup ."Resulting external message: " <s csr. cr
+2 boc+>B dup Bx. cr
+"out/widthdraw-coins.boc" tuck B>file
+."(Saved to file " type .")" cr
