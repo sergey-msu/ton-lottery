@@ -3,7 +3,6 @@
 FUNC="/opt/ton/build/crypto/func"
 STD_LIB="/opt/ton/ton/crypto/smartcont/stdlib.fc"
 OUT_PATH="out"
-TESTS_PATH="tests"
 
 # build func source to output fift
 COMPILATION_RESULT=$( \

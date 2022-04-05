@@ -12,11 +12,11 @@ export FIFTPATH=$FIFT_PATH/lib
 ./build.sh
 BUILD_STATUS=$?
 
-# run tests
+# create publish boc
 if [[ $BUILD_STATUS == 0 ]]; then
     echo "Publishing..."
     
-    $FIFT_EXE_PATH -s $REQUESTS_PATH/lottery-publish_NEW.fif $WORKCHAIN
+    $FIFT_EXE_PATH -s $REQUESTS_PATH/lottery-publish.fif $WORKCHAIN
     
     echo "Publish done"
 fi

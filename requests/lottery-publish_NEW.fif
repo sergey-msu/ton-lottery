@@ -7,7 +7,7 @@ $1 parse-workchain-id =: wc    // contract workchain
 def? $2 { @' $2 } { "out/lottery" } cond =: file-base  // file path prefix
 
 // code
-"out/lottery-code.fif" include <s =: contract_code
+"out/lottery-code.fif" include =: contract_code
 
 // data
 <b 0 32 u, 
@@ -19,21 +19,22 @@ def? $2 { @' $2 } { "out/lottery" } cond =: file-base  // file path prefix
    0 32 i,  // owner_workchain
    0x114fd5c7dfba61c710e834699c29ceedf404b8891efa1cf8f63a3d1d81263cdb 256 u,   // owner_account_id
    dictnew dict,  // orders
-b> <s =: contract_data
+b> =: contract_data
 
 // libraries
 null
 
-// create StateInit = (flags, code, data)
+// create StateInit = (flags, code, data, libs)
 <b 
    b{00110} s, 
-   <b contract_code s, b> ref, 
-   <b contract_data s, b> ref, 
-b> dup =: state_init
-dup ."StateInit: " <s csr. cr
+   contract_code ref, 
+   contract_data ref,
+   null dict,
+b> =: state_init
+state_init ."StateInit: " <s csr. cr
 
 // create smart contract address = hash(StateInit)
-dup hashu wc swap 2dup 2constant smc_addr
+state_init hashu wc swap 2dup 2constant smc_addr
 ."Smart contract address: " 2dup .addr cr
 2dup file-base +".addr" save-address-verbose
 ."Non-bounceable address (for init): " 2dup 7 .Addr cr
@@ -43,8 +44,9 @@ dup hashu wc swap 2dup 2constant smc_addr
 <b 
    0 32 u, // first seqno = 0
    0 7 u,  // first operation = 0 (init)
-b> dup =: init_message 
-dup hashu wallet_pk ed25519_sign_uint rot
+b> =: init_message
+init_message ."Initial message: " <s csr. cr
+init_message hashu wallet_pk ed25519_sign_uint =: signature
 
 // final external query to blockchain
 <b 
@@ -52,9 +54,11 @@ dup hashu wallet_pk ed25519_sign_uint rot
    smc_addr addr,      // { -rot 8 i, swap 256 u, } : addr  (see TonUtil.fif)
    b{000010} s, 
    state_init <s s, 
-   b{0} s, 
+   b{0} s,
+   signature B,
    init_message <s s,
 b>
+dup ."External message for initialization is " <s csr. cr
 
 cr
 2 boc+>B dup Bx. cr
