@@ -26,7 +26,7 @@ null
 
 // create StateInit = (flags, code, data, libs)
 <b 
-   b{00110} s, 
+   b{0011} s, 
    contract_code ref, 
    contract_data ref,
    null dict,
@@ -64,3 +64,5 @@ cr
 2 boc+>B dup Bx. cr
 file-base +"-query.boc" tuck B>file
 ."(Saved smart contract creating query to file " type .")" cr
+
+cr ."Address:" cr smc_addr 6 .Addr cr cr

@@ -35,3 +35,7 @@ int get_outgoing_amount() method_id {
     (_, _, _, _, _, int outgoing_amount, _, _, _) = unpack_state();
     return outgoing_amount;
 }
+
+int get_test_message() method_id {
+    return 1986;
+}

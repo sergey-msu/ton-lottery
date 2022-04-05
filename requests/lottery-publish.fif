@@ -50,3 +50,5 @@ dup ."External message for initialization is " <s csr. cr
 2 boc+>B dup Bx. cr
 file-base +"-query.boc" tuck B>file
 ."(Saved wallet creating query to file " type .")" cr
+
+cr ."Address:" cr wallet_addr 6 .Addr cr cr

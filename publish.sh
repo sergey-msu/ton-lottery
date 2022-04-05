@@ -16,7 +16,7 @@ BUILD_STATUS=$?
 if [[ $BUILD_STATUS == 0 ]]; then
     echo "Publishing..."
     
-    $FIFT_EXE_PATH -s $REQUESTS_PATH/lottery-publish.fif $WORKCHAIN
+    $FIFT_EXE_PATH -s $REQUESTS_PATH/lottery-publish_NEW.fif $WORKCHAIN
     
     echo "Publish done"
 fi
